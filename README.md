@@ -2,12 +2,12 @@
 A social media analysis tool designed to evaluate various social media pages, posts, views, and video analytics, featuring interactive visualizations and a personalized dashboard for comprehensive insights.
 
 # SPRINT PLAN:
-Week 1: User Registration
+## Week 1: User Registration
 Design and implement the user registration form.
 Add input validation for fields (e.g., email, password strength).
 Set up a secure database to store user information.
 Implement basic user authentication (sign-up/login/logout).
-Deliverables:
+### Deliverables:
 
 Functional user registration and login/logout system.
 Week 2: File Upload Form
