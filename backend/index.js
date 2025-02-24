@@ -16,7 +16,7 @@ const pool = new Pool({
 app.use(cors());
 app.use(express.json());
 
-// Example endpoint: Login route
+// Login endpoint
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -33,8 +33,8 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Generate JWT token
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // Generate JWT token including the user's full name
+    const token = jwt.sign({ id: user.id, name: user.full_name }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token });
   } catch (error) {
     console.error('Error during login:', error);
@@ -42,13 +42,13 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Register endpoint
+// Register endpoint (available at /register)
 app.post('/register', async (req, res) => {
-  const { email, password } = req.body;
-
-  // Basic validation: Check if email and password are provided
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required' });
+  const { fullName, email, password } = req.body;
+  
+  // Basic validation: Check if all required fields are provided
+  if (!fullName || !email || !password) {
+    return res.status(400).json({ error: 'Full name, email, and password are required' });
   }
 
   try {
@@ -64,8 +64,8 @@ app.post('/register', async (req, res) => {
 
     // Insert new user into the database
     const result = await pool.query(
-      'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *',
-      [email, hashedPassword]
+      'INSERT INTO users (full_name, email, password) VALUES ($1, $2, $3) RETURNING *',
+      [fullName, email, hashedPassword]
     );
 
     // Respond with the new user data (without the password, ideally)
@@ -75,6 +75,38 @@ app.post('/register', async (req, res) => {
     res.status(201).json({ message: 'User registered successfully', user: newUser });
   } catch (error) {
     console.error('Error during registration:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Signup endpoint (alias for /register)
+app.post('/signup', async (req, res) => {
+  const { fullName, email, password } = req.body;
+  
+  if (!fullName || !email || !password) {
+    return res.status(400).json({ error: 'Full name, email, and password are required' });
+  }
+
+  try {
+    const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({ error: 'User already exists' });
+    }
+    
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    
+    const result = await pool.query(
+      'INSERT INTO users (full_name, email, password) VALUES ($1, $2, $3) RETURNING *',
+      [fullName, email, hashedPassword]
+    );
+    
+    const newUser = result.rows[0];
+    delete newUser.password;
+    
+    res.status(201).json({ message: 'User registered successfully', user: newUser });
+  } catch (error) {
+    console.error('Error during signup:', error);
     res.status(500).json({ error: error.message });
   }
 });
