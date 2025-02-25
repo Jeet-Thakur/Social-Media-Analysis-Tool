@@ -27,7 +27,8 @@ SET default_table_access_method = heap;
 CREATE TABLE public.users (
     id integer NOT NULL,
     email character varying(255) NOT NULL,
-    password text NOT NULL
+    password text NOT NULL,
+    full_name character varying(255)
 );
 
 
@@ -66,8 +67,8 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (id, email, password) FROM stdin;
-2	mydummy@gmail.com	$2b$10$B83YQ7EoU/1tKLb3.eHlbe6uei5i5.tGxi/VvcAvwA09nfg2gVgWG
+COPY public.users (id, email, password, full_name) FROM stdin;
+4	name@gmail.com	$2b$10$4B7maHjD9/OJTVKbssMGgeavPLUqdhbC2IifNRELe367sB8ScRJ3S	my name
 \.
 
 
@@ -75,7 +76,7 @@ COPY public.users (id, email, password) FROM stdin;
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 2, true);
+SELECT pg_catalog.setval('public.users_id_seq', 4, true);
 
 
 --

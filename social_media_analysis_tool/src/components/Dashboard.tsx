@@ -247,18 +247,7 @@ const Dashboard = () => {
                 }}
                 className="me-3"
               />
-              <div className="d-flex align-items-center">
-                <input
-                  type="text"
-                  className="form-control rounded-pill"
-                  placeholder="Search..."
-                  style={{ width: "100%", maxWidth: "400px", height: "45px" }}
-                  readOnly
-                />
-                <span className="btn btn-link text-white ms-2 p-0">
-                  <FaSearch size={24} />
-                </span>
-              </div>
+
             </div>
             <div>
               {token && userName ? (
