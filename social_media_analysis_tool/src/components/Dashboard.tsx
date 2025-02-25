@@ -247,7 +247,6 @@ const Dashboard = () => {
                 }}
                 className="me-3"
               />
-
             </div>
             <div>
               {token && userName ? (
