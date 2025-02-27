@@ -9,9 +9,41 @@ const SignupPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
+  const validatePassword = (password: string) => {
+    const minLength = password.length >= 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasSpecialChar = /[\W_]/.test(password); // Matches special characters
+
+    if (!minLength) {
+      alert("Password must be at least 8 characters long.");
+      return false;
+    }
+    if (!hasUpperCase) {
+      alert("Password must contain at least one uppercase letter.");
+      return false;
+    }
+    if (!hasLowerCase) {
+      alert("Password must contain at least one lowercase letter.");
+      return false;
+    }
+    if (!hasSpecialChar) {
+      alert("Password must contain at least one special character.");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Basic password match validation
+
+    console.log("Password:", password, "Confirm Password:", confirmPassword); // Debugging
+
+    if (!validatePassword(password)) {
+      return;
+    }
+
     if (password !== confirmPassword) {
       alert("Passwords do not match.");
       return;

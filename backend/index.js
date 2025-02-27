@@ -34,7 +34,7 @@ app.post('/login', async (req, res) => {
     }
 
     // Generate JWT token including the user's full name
-    const token = jwt.sign({ id: user.id, name: user.full_name }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, name: user.full_name, profile_picture: user.profile_picture || "" }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token });
   } catch (error) {
     console.error('Error during login:', error);
@@ -107,6 +107,23 @@ app.post('/signup', async (req, res) => {
     res.status(201).json({ message: 'User registered successfully', user: newUser });
   } catch (error) {
     console.error('Error during signup:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/profile', async (req, res) => {
+  const { id, email, full_name, date_of_birth, phone, profile_picture } = req.body;
+  // You might authenticate the request using the token (not shown here)
+  try {
+    const result = await pool.query(
+      `UPDATE users 
+       SET email = $1, full_name = $2, date_of_birth = $3, phone = $4, profile_picture = $5 
+       WHERE id = $6 RETURNING *`,
+      [email, full_name, date_of_birth, phone, profile_picture, id]
+    );
+    res.json({ user: result.rows[0] });
+  } catch (error) {
+    console.error("Error updating profile:", error);
     res.status(500).json({ error: error.message });
   }
 });

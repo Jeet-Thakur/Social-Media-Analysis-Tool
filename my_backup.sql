@@ -28,7 +28,10 @@ CREATE TABLE public.users (
     id integer NOT NULL,
     email character varying(255) NOT NULL,
     password text NOT NULL,
-    full_name character varying(255)
+    full_name character varying(255),
+    profile_picture text,
+    date_of_birth date,
+    phone character varying(20)
 );
 
 
@@ -67,8 +70,8 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (id, email, password, full_name) FROM stdin;
-4	name@gmail.com	$2b$10$4B7maHjD9/OJTVKbssMGgeavPLUqdhbC2IifNRELe367sB8ScRJ3S	my name
+COPY public.users (id, email, password, full_name, profile_picture, date_of_birth, phone) FROM stdin;
+4		$2b$10$4B7maHjD9/OJTVKbssMGgeavPLUqdhbC2IifNRELe367sB8ScRJ3S			2025-02-27	1111111111
 \.
 
 

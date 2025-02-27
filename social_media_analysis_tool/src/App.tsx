@@ -8,6 +8,7 @@ import {
 import Login from "./components/Login";
 import SignupPage from "./components/Signup";
 import Dashboard from "./components/Dashboard";
+import Profile from "./components/Profile"; // new import
 
 const App = () => {
   return (
@@ -24,12 +25,17 @@ const App = () => {
           path="/dashboard"
           element={<ProtectedRoute component={<Dashboard />} />}
         />
+        {/* Protected profile route */}
+        <Route
+          path="/profile"
+          element={<ProtectedRoute component={<Profile />} />}
+        />
       </Routes>
     </Router>
   );
 };
 
-// Protects the dashboard so only logged-in users can access it
+// Protects the dashboard and profile so only logged-in users can access them
 const ProtectedRoute = ({ component }: { component: React.ReactElement }) => {
   const token = localStorage.getItem("token");
   return token ? component : <Navigate to="/login" />;

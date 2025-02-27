@@ -227,6 +227,16 @@ const Dashboard = () => {
     }
   }
 
+  let userProfilePicture = "";
+  if (token) {
+    try {
+      const decoded: any = jwtDecode(token);
+      userProfilePicture = decoded.profile_picture || "";
+    } catch (error) {
+      console.error("Error decoding token:", error);
+    }
+  }
+
   return (
     <div className="container-fluid p-0">
       {/* Sticky Header */}
@@ -238,7 +248,7 @@ const Dashboard = () => {
           <div className="d-flex justify-content-between align-items-center py-2">
             <div className="d-flex align-items-center">
               <img
-                src="/logo.png"
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFkQkqMeKoGbEvigZjXpJVTOw0WJ9Mjm4CrQ&s"
                 alt="Amrita Socials Logo"
                 style={{
                   height: "60px",
@@ -251,6 +261,18 @@ const Dashboard = () => {
             <div>
               {token && userName ? (
                 <div className="d-flex align-items-center">
+                  <img
+                    src={userProfilePicture || "/default-profile.png"}
+                    alt="Profile"
+                    style={{
+                      height: "40px",
+                      width: "40px",
+                      borderRadius: "50%",
+                      marginRight: "10px",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => navigate("/profile")}
+                  />
                   <span className="me-3">Welcome, {userName}</span>
                   <button
                     className="btn btn-outline-warning rounded-pill"
@@ -331,7 +353,38 @@ const Dashboard = () => {
         </div>
         <div className="container my-5">
           <div className="row g-4">
-            {[...Array(6)].map((_, index) => (
+            {[
+              {
+                title: "Audience Engagement Analysis",
+                description:
+                  "Analyze likes, shares, and comments to understand audience engagement trends.",
+              },
+              {
+                title: "Trending Topics Identification",
+                description:
+                  "Discover trending topics and hashtags across your social media channels.",
+              },
+              {
+                title: "Sentiment Analysis",
+                description:
+                  "Evaluate audience sentiment using text and image analysis.",
+              },
+              {
+                title: "Content Performance Metrics",
+                description:
+                  "Monitor post performance, reach, and ROI for your social media campaigns.",
+              },
+              {
+                title: "Influencer Impact",
+                description:
+                  "Assess how influencers drive engagement and visibility for your brand.",
+              },
+              {
+                title: "Competitor Benchmarking",
+                description:
+                  "Compare your performance with competitors to refine your strategy.",
+              },
+            ].map((func, index) => (
               <div className="col-md-4" key={index}>
                 <div
                   className="p-4 text-black text-start border border-dark rounded shadow-sm bg-white"
@@ -343,11 +396,8 @@ const Dashboard = () => {
                     (e.currentTarget.style.transform = "scale(1)")
                   }
                 >
-                  <h5 className="fw-bold">Profile Performance Report</h5>
-                  <p>
-                    Access a high-level overview of performance across all
-                    connected profiles to quickly evaluate social growth.
-                  </p>
+                  <h5 className="fw-bold">{func.title}</h5>
+                  <p>{func.description}</p>
                 </div>
               </div>
             ))}
@@ -414,7 +464,7 @@ const Dashboard = () => {
             {/* Left side image */}
             <div className="col-lg-6 mb-4 mb-lg-0">
               <img
-                src="https://lh3.googleusercontent.com/proxy/4r23ta0LOswKRlygV999KpUSINg8yPE8ASLEoUbxS7UjU6TlqQiWG9T1tepPxwPL6CHu0ujXleqvKD2pxfbLB7jxeNG6yb2hLMLJwjdjZhfeP4fmtk8myOSidegGQ3W9h4PQ9q0ypFr-BhruiikT9PAzMhKcvrEC4EeaOMAeMb2pOI0fqSxougedEVHMNGH0l9Qky0jxjhJYyZ_5P2eYhyJMINFujXoXzWeoDRh-Ad3a7om2j0TEcm41"
+                src="https://media.sproutsocial.com/uploads/2023/02/How-to-perform-a-social-media-competitive-analysis-Final.png"
                 alt="Left side visual"
                 className="img-fluid rounded shadow"
               />
