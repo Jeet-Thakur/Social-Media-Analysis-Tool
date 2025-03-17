@@ -80,9 +80,21 @@ const Dashboard: React.FC = () => {
     ],
   };
 
+  let userProfilePicture = "";
+  if (token) {
+    try {
+      const decoded: any = jwtDecode(token);
+      userProfilePicture = decoded.profile_picture || "";
+    } catch (error) {
+      console.error("Error decoding token:", error);
+    }
+  }
+
   return (
+
     <div style={{ display: "flex", height: "100vh", overflowX: "hidden" }}>
       {/* Sidebar */}
+
       <div
         style={{
           width: "250px",
@@ -105,6 +117,7 @@ const Dashboard: React.FC = () => {
             {userName}
           </span>
         </div>
+
 
         {/* Sidebar Links */}
         {["Home", "My Profile", "Settings", "Top List"].map((text, index) => (
@@ -165,6 +178,7 @@ const Dashboard: React.FC = () => {
               }}
             >
               {["Sentiment Analysis", "Filter", "Trend", "Analysis"].map((item, idx) => (
+
                 <div
                   key={idx}
                   style={{
@@ -179,13 +193,16 @@ const Dashboard: React.FC = () => {
                   onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
                   onClick={item === "Analysis" ? handleAnalysisClick : item === "Trend" ? handleTrendClick : handleFilterClick}
                 >
+
                   {item}
+
                 </div>
               ))}
             </div>
           )}
         </div>
       </div>
+
 
       {/* Main Content */}
       <div style={{ flex: 1, padding: "20px", backgroundColor: "#F8FAFC", overflowY: "auto" }}>
@@ -216,6 +233,7 @@ const Dashboard: React.FC = () => {
                   {index === 0 ? (
                     <div style={{ fontSize: "3rem", color: "black", textAlign: "center" }}>
                       53K <span style={{ fontSize: "1rem", color: "black" }}>views</span>
+
                     </div>
                   ) : index === 1 ? (
                     <div style={{ fontSize: "3rem", color: "black", textAlign: "center" }}>

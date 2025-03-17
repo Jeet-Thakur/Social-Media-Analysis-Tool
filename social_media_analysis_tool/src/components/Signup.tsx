@@ -37,7 +37,7 @@ const SignupPage = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     console.log("Password:", password, "Confirm Password:", confirmPassword); // Debugging
 
     if (!validatePassword(password)) {

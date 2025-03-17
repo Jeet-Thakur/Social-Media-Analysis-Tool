@@ -110,8 +110,10 @@ app.post("/register", async (req, res) => {
   }
 });
 
+
 // ✅ Guest Login Endpoint
 app.post("/guest", async (req, res) => {
+
   try {
     const guestUser = { id: "guest", role: "guest" };
     const token = jwt.sign(guestUser, process.env.JWT_SECRET, { expiresIn: "1h" });
