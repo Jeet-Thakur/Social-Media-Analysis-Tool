@@ -1,14 +1,85 @@
-import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Chart, BarElement, CategoryScale, LinearScale, Tooltip, Title, Legend } from "chart.js";
+import { Bar } from "react-chartjs-2";
 import { Card, Row, Col, Table } from "react-bootstrap";
-import { Bar, Pie, Line } from 'react-chartjs-2';
 import { useNavigate } from "react-router-dom";
 
-const Dashboard: React.FC = () => {
-  const userName = ""; // Set this to the actual username if available
-  const navigate = useNavigate();
+Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Title, Legend);
+
+interface VideoData {
+  Title: string;
+  Views: number;
+  Likes: number;
+  "Published At": string;
+}
+
+const Trend: React.FC = () => {
+  const [trendingVideos, setTrendingVideos] = useState<VideoData[]>([]);
+  const [wordCloudUrl, setWordCloudUrl] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [region, setRegion] = useState("IN");  // Default to India
+  const [theme, setTheme] = useState<"light" | "dark">("dark");  // Default to dark theme
   const [showDropdown, setShowDropdown] = useState(false);
   const [showTopCreators, setShowTopCreators] = useState(false);
+  const navigate = useNavigate();
+
+  const fetchData = async () => {
+    try {
+      // Fetch trending video data
+      const trendingResponse = await axios.get(`http://127.0.0.1:5000/get_trending_data?region=${region}`);
+      setTrendingVideos(trendingResponse.data);
+
+      // Fetch word cloud image
+      const wordCloudResponse = await axios.get(`http://127.0.0.1:5000/wordcloud?region=${region}`);
+      setWordCloudUrl(wordCloudResponse.data.wordcloud);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [region]);
+
+  // Toggle between light and dark themes
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  };
+
+  // Define styles for light and dark themes
+  const themeStyles = {
+    light: {
+      backgroundColor: "#ffffff",
+      color: "#000000",
+      tableBorderColor: "#000000",
+      chartBackgroundColor: "rgba(255, 206, 86, 0.2)",
+    },
+    dark: {
+      backgroundColor: "#121212",
+      color: "#ffffff",
+      tableBorderColor: "#ffffff",
+      chartBackgroundColor: "yellow",
+    },
+  };
+
+  const currentTheme = themeStyles[theme];
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  const chartData = {
+    labels: trendingVideos.slice(0, 10).map(video => video.Title),
+    datasets: [{
+      label: "Views",
+      data: trendingVideos.slice(0, 10).map(video => video.Views),
+      backgroundColor: currentTheme.chartBackgroundColor,
+    }]
+  };
 
   // Sample dataset for top creators
   const topCreatorsData = [
@@ -38,55 +109,13 @@ const Dashboard: React.FC = () => {
     setShowTopCreators(!showTopCreators);
   };
 
-  // Sample data for charts
-  const sampleData = {
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
-    values: [65, 59, 80, 81, 56, 55, 40],
-  };
-
-  const barData = {
-    labels: sampleData.labels,
-    datasets: [
-      {
-        label: 'Bar Chart Data',
-        data: sampleData.values,
-        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const pieData = {
-    labels: ['Red', 'Blue', 'Yellow'],
-    datasets: [{
-      data: [300, 50, 100],
-      backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(255, 206, 86, 0.6)'],
-      borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
-      borderWidth: 1,
-    }],
-  };
-
-  const lineData = {
-    labels: sampleData.labels,
-    datasets: [
-      {
-        label: 'Line Chart Data',
-        data: sampleData.values,
-        fill: false,
-        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-      },
-    ],
-  };
-
   return (
     <div style={{ display: "flex", height: "100vh", overflowX: "hidden" }}>
       {/* Sidebar */}
       <div
         style={{
           width: "250px",
-          backgroundColor: "#2DAA9E",
+          backgroundColor: "#1A202C", // Updated to dark blue
           color: "white",
           display: "flex",
           flexDirection: "column",
@@ -102,7 +131,7 @@ const Dashboard: React.FC = () => {
             style={{ height: "50px", marginRight: "15px" }}
           />
           <span style={{ fontSize: "1.3rem", fontWeight: "bold" }}>
-            {userName}
+            User Name
           </span>
         </div>
 
@@ -120,7 +149,7 @@ const Dashboard: React.FC = () => {
               borderRadius: "8px",
               transition: "0.3s ease-in-out",
             }}
-            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#66D2CE")}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#3B82F6")} // Lighter blue for hover
             onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
             onClick={text === "Top List" ? handleTopListClick : undefined}
           >
@@ -144,7 +173,7 @@ const Dashboard: React.FC = () => {
               borderRadius: "8px",
               transition: "0.3s ease-in-out",
             }}
-            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#66D2CE")}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#3B82F6")} // Lighter blue for hover
             onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
           >
             Analytics
@@ -188,86 +217,73 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div style={{ flex: 1, padding: "20px", backgroundColor: "#F8FAFC", overflowY: "auto" }}>
-        {/* Cards Section */}
-        <Row className="mb-4">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <Col xs={12} sm={6} md={3} key={index} className="mb-4">
-              <Card
-                style={{
-                  width: "100%",
-                  transition: "transform 0.2s, background-color 0.2s, box-shadow 0.2s",
-                  cursor: "pointer",
-                  margin: "10px",
-                  backgroundColor: "#FFEEAD",
-                  color: "black",
-                  border: "none",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.05)";
-                  e.currentTarget.style.boxShadow = "0px 4px 20px rgba(0, 0, 0, 0.2)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "scale(1)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                <Card.Body>
-                  {index === 0 ? (
-                    <div style={{ fontSize: "3rem", color: "black", textAlign: "center" }}>
-                      53K <span style={{ fontSize: "1rem", color: "black" }}>views</span>
-                    </div>
-                  ) : index === 1 ? (
-                    <div style={{ fontSize: "3rem", color: "black", textAlign: "center" }}>
-                      27% <span style={{ fontSize: "1rem", color: "black" }}>Population</span>
-                    </div>
-                  ) : index === 2 ? (
-                    <div style={{ fontSize: "3rem", color: "black", textAlign: "center" }}>
-                      10M <span style={{ fontSize: "1rem", color: "black" }}>Subscribers</span>
-                    </div>
-                  ) : (
-                    <div style={{ fontSize: "3rem", color: "black", textAlign: "center" }}>
-                      199K <span style={{ fontSize: "1rem", color: "black" }}>US Dollars</span>
-                    </div>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+      <div style={{ flex: 1, padding: "20px", backgroundColor: currentTheme.backgroundColor, color: currentTheme.color, overflowY: "auto" }}>
+        <h1>YouTube Trending Analysis</h1>
 
-        {/* White Cards Section (2x2 Grid) with Graphs */}
-        <Row>
-          {Array.from({ length: 4 }).map((_, index) => (
-            <Col xs={12} sm={6} md={6} key={index} className="mb-4">
-              <Card
-                style={{
-                  width: "100%",
-                  backgroundColor: "white",
-                  border: "none",
-                  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
-                  transition: "transform 0.2s, box-shadow 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.05)";
-                  e.currentTarget.style.boxShadow = "0px 8px 30px rgba(0, 0, 0, 0.2)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "scale(1)";
-                  e.currentTarget.style.boxShadow = "0px 4px 20px rgba(0, 0, 0, 0.1)";
-                }}
-              >
-                <Card.Body>
-                  <h5 style={{ textAlign: "center" }}>Graphs</h5>
-                  {index === 0 && <Bar data={barData} options={{ responsive: true }} />}
-                  {index === 1 && <Pie data={pieData} options={{ responsive: true }} />}
-                  {index === 2 && <Line data={lineData} options={{ responsive: true }} />}
-                  {index === 3 && <Bar data={barData} options={{ responsive: true }} />} {/* Placeholder for Histogram */}
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            backgroundColor: currentTheme.color,
+            color: currentTheme.backgroundColor,
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            marginBottom: "20px",
+          }}
+        >
+          Switch to {theme === "light" ? "Dark" : "Light"} Mode
+        </button>
+
+        {/* Country Selection Dropdown */}
+        <div style={{ marginBottom: "20px" }}>
+          <label htmlFor="region">Select Country: </label>
+          <select
+            id="region"
+            value={region}
+            onChange={(e) => setRegion(e.target.value)}
+            style={{ padding: "5px", fontSize: "16px", backgroundColor: currentTheme.backgroundColor, color: currentTheme.color }}
+          >
+            <option value="IN">India</option>
+            <option value="US">United States</option>
+            <option value="GB">United Kingdom</option>
+            <option value="JP">Japan</option>
+            <option value="CA">Canada</option>
+            {/* Add more countries as needed */}
+          </select>
+        </div>
+
+        <h3>Trending Video Views</h3>
+        <div style={{ maxWidth: "80%", margin: "auto" }}>
+          <Bar data={chartData} />
+        </div>
+
+        <h3>Top Trending Videos</h3>
+        <table border={1} style={{ width: "80%", margin: "auto", borderCollapse: "collapse", borderColor: currentTheme.tableBorderColor }}>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Views</th>
+              <th>Likes</th>
+              <th>Published Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {trendingVideos.slice(0, 10).map((video, index) => (
+              <tr key={index}>
+                <td>{video.Title}</td>
+                <td>{video.Views}</td>
+                <td>{video.Likes}</td>
+                <td>{new Date(video["Published At"]).toDateString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <h3>Trending Keywords (Word Cloud)</h3>
+        {wordCloudUrl ? <img src={wordCloudUrl} alt="Word Cloud" style={{ maxWidth: "80%" }} /> : <p>Loading word cloud...</p>}
 
         {/* Top Creators Table */}
         {showTopCreators && (
@@ -302,4 +318,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default Trend;
